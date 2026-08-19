@@ -3,23 +3,43 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Modèle 3D</title>
+  <title>Diagnostic 3D</title>
   <script type="module"
     src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.1.0/model-viewer.min.js"></script>
   <style>
-    html, body { margin:0; height:100%; background:#f0f0f0; }
-    model-viewer { width:100%; height:100%; }
+    html, body { margin:0; height:100%; background:#f0f0f0; font-family:sans-serif; }
+    model-viewer { width:100%; height:80%; display:block; }
+    #log { padding:10px; font-size:14px; white-space:pre-wrap; }
   </style>
 </head>
 <body>
-  <model-viewer
+  <model-viewer id="mv"
     src="15_08_2026-v1.glb"
     alt="Modèle 3D"
     camera-controls
     touch-action="pan-y"
     auto-rotate
-    shadow-intensity="1"
-    environment-image="neutral">
+    shadow-intensity="1">
   </model-viewer>
+  <div id="log">Chargement…</div>
+
+  <script>
+    const log = document.getElementById('log');
+    const mv  = document.getElementById('mv');
+
+    const gl = document.createElement('canvas').getContext('webgl2')
+            || document.createElement('canvas').getContext('webgl');
+    log.textContent = gl ? 'WebGL : OK\n' : 'WebGL : INDISPONIBLE\n';
+
+    setTimeout(() => {
+      log.textContent += customElements.get('model-viewer')
+        ? 'Composant model-viewer : enregistré\n'
+        : 'Composant model-viewer : NON enregistré (script non exécuté)\n';
+    }, 2000);
+
+    mv.addEventListener('load',  () => log.textContent += 'Modèle : chargé\n');
+    mv.addEventListener('error', e => log.textContent += 'Erreur : ' + JSON.stringify(e.detail) + '\n');
+    window.addEventListener('error', e => log.textContent += 'JS : ' + e.message + '\n');
+  </script>
 </body>
 </html>
