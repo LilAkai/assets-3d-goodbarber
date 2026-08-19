@@ -20,7 +20,7 @@
 
   <div class="onglets" id="onglets"></div>
 
-  <script>
+    <script>
     const modeles = [
       { nom: 'Modèle A', fichier: '15_08_2026-v1.glb' },
       { nom: 'Modèle B', fichier: 'modele-2.glb' },
@@ -30,17 +30,30 @@
     const mv = document.getElementById('mv');
     const barre = document.getElementById('onglets');
 
-    modeles.forEach((m, i) => {
-      const b = document.createElement('button');
-      b.textContent = m.nom;
-      if (i === 0) b.classList.add('actif');
-      b.onclick = () => {
-        mv.src = m.fichier;
-        barre.querySelectorAll('button').forEach(x => x.classList.remove('actif'));
-        b.classList.add('actif');
-      };
-      barre.appendChild(b);
-    });
+    const demande = new URLSearchParams(location.search).get('m');
+    const trouve = modeles.find(m => m.fichier === demande);
+
+    if (trouve) {
+      // Mode fiche produit : un seul modèle, pas de boutons
+      mv.src = trouve.fichier;
+      mv.alt = trouve.nom;
+      barre.style.display = 'none';
+      document.body.style.padding = '0';
+      mv.style.height = '100vh';
+    } else {
+      // Mode galerie : tous les modèles avec les boutons
+      modeles.forEach((m, i) => {
+        const b = document.createElement('button');
+        b.textContent = m.nom;
+        if (i === 0) b.classList.add('actif');
+        b.onclick = () => {
+          mv.src = m.fichier;
+          barre.querySelectorAll('button').forEach(x => x.classList.remove('actif'));
+          b.classList.add('actif');
+        };
+        barre.appendChild(b);
+      });
+    }
   </script>
 </body>
 </html>
