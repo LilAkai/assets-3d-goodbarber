@@ -23,23 +23,33 @@
   </model-viewer>
   <div id="log">Chargement…</div>
 
-  <script>
+    <script>
     const log = document.getElementById('log');
     const mv  = document.getElementById('mv');
+    let lines = [];
+    const show = () => log.textContent = lines.join('\n');
 
     const gl = document.createElement('canvas').getContext('webgl2')
             || document.createElement('canvas').getContext('webgl');
-    log.textContent = gl ? 'WebGL : OK\n' : 'WebGL : INDISPONIBLE\n';
+    lines.push(gl ? 'WebGL : OK' : 'WebGL : INDISPONIBLE');
+    lines.push('Composant : en attente…');
+    show();
 
+    const t0 = Date.now();
+    customElements.whenDefined('model-viewer').then(() => {
+      lines[1] = 'Composant : enregistré après ' + (Date.now() - t0) + ' ms';
+      show();
+    });
     setTimeout(() => {
-      log.textContent += customElements.get('model-viewer')
-        ? 'Composant model-viewer : enregistré\n'
-        : 'Composant model-viewer : NON enregistré (script non exécuté)\n';
-    }, 2000);
+      if (!customElements.get('model-viewer')) {
+        lines[1] = 'Composant : TOUJOURS absent après 15 s';
+        show();
+      }
+    }, 15000);
 
-    mv.addEventListener('load',  () => log.textContent += 'Modèle : chargé\n');
-    mv.addEventListener('error', e => log.textContent += 'Erreur : ' + JSON.stringify(e.detail) + '\n');
-    window.addEventListener('error', e => log.textContent += 'JS : ' + e.message + '\n');
+    mv.addEventListener('load',  () => { lines.push('Modèle : chargé'); show(); });
+    mv.addEventListener('error', e => { lines.push('Erreur : ' + JSON.stringify(e.detail)); show(); });
+    window.addEventListener('error', e => { lines.push('JS : ' + e.message); show(); }, true);
   </script>
 </body>
 </html>
