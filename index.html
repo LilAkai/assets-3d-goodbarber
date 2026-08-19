@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Diagnostic 3D</title>
-  <script type="module"
-        src="https://modelviewer.dev/shared-assets/models/Astronaut.glb"></script>
+  <title>Modèle 3D</title>
+  <script type="module" src="model-viewer.min.js"></script>
   <style>
     html, body { margin:0; height:100%; background:#f0f0f0; font-family:sans-serif; }
     model-viewer { width:100%; height:80%; display:block; }
@@ -19,11 +18,12 @@
     camera-controls
     touch-action="pan-y"
     auto-rotate
-    shadow-intensity="1">
+    shadow-intensity="1"
+    environment-image="neutral">
   </model-viewer>
-  <div id="log">Chargement…</div>
+  <div id="log"></div>
 
-    <script>
+  <script>
     const log = document.getElementById('log');
     const mv  = document.getElementById('mv');
     let lines = [];
@@ -48,8 +48,12 @@
     }, 15000);
 
     mv.addEventListener('load',  () => { lines.push('Modèle : chargé'); show(); });
-    mv.addEventListener('error', e => { lines.push('Erreur : ' + JSON.stringify(e.detail)); show(); });
-    window.addEventListener('error', e => { lines.push('JS : ' + e.message); show(); }, true);
+    mv.addEventListener('error', e => { lines.push('Erreur modèle : ' + JSON.stringify(e.detail)); show(); });
+    window.addEventListener('error', e => {
+      const cible = e.target && e.target.src ? e.target.src : ('script: ' + e.message);
+      lines.push('Échec de chargement → ' + cible);
+      show();
+    }, true);
   </script>
 </body>
 </html>
